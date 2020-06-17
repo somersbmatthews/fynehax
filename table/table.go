@@ -27,7 +27,7 @@ import (
 // TODO: should calculate row height based on font size.
 const textHeight int = 20
 
-const minWidth int = 50
+const maxWidth int = 300
 
 type tableRenderer struct {
 	table   *TableWidget
@@ -63,6 +63,8 @@ func (t *tableRenderer) BackgroundColor() color.Color {
 func (t *tableRenderer) Refresh() {
 	// TODO: this is not efficient since it destroys and re-creates all the
 	// table cells.
+
+	t.table.updateColumnWidthsIfNeeded()
 
 	t.objects = make([]fyne.CanvasObject, 0)
 
@@ -119,7 +121,7 @@ type TableWidget struct {
 // and contains the same number of column widths as there are columns in t.df.
 func (table *TableWidget) updateColumnWidthsIfNeeded() {
 	if (table.columnWidths == nil) || (len(table.columnWidths) != len(table.df.Series)) {
-		table.CalculateColumnWidths(minWidth)
+		table.CalculateColumnWidths(maxWidth)
 	}
 }
 
@@ -181,7 +183,13 @@ func (table *TableWidget) CreateRenderer() fyne.WidgetRenderer {
 
 func NewTableWidget(df *dataframe.DataFrame) *TableWidget {
 	table := &TableWidget{df: df}
-	table.CalculateColumnWidths(minWidth)
+	table.CalculateColumnWidths(maxWidth)
 	table.ExtendBaseWidget(table)
 	return table
+}
+
+func (table *TableWidget) ReplaceDataFrame(newdf *dataframe.DataFrame) {
+	table.df = newdf
+	table.CalculateColumnWidths(maxWidth)
+	table.Refresh()
 }

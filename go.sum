@@ -148,6 +148,7 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
 github.com/rocketlaunchr/dataframe-go v0.0.0-20200525081431-b8b481c96d94 h1:5S40/71blwWeI3A/XVatDTc6Ulr6Rz86ryGvMge2NZo=
 github.com/rocketlaunchr/dataframe-go v0.0.0-20200525081431-b8b481c96d94/go.mod h1:iK/vExnQGsWfgJPYICLL5BkMKLFr7j/ykA2OQ/f62U8=
+github.com/rocketlaunchr/mysql-go v1.1.3 h1:7wYwOWWSl2tP6D9AI3MKqVJdiI5YL3uDnHV40b5e6CE=
 github.com/rocketlaunchr/mysql-go v1.1.3/go.mod h1:SD/1bpRrmcdnBYRJq8eCerqqS1nTR9Y9WdW+LPzDLAQ=
 github.com/rogpeppe/fastuuid v1.2.0/go.mod h1:jVj6XXZzXRy/MSR5jhDC/2q6DgLz+nrA6LYCDYWNEvQ=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=

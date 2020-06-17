@@ -1,11 +1,22 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"io/ioutil"
+	"strings"
+
+	"fyne.io/fyne"
 	"fyne.io/fyne/app"
+	"fyne.io/fyne/dialog"
+
 	"git.sr.ht/~charles/fynehax/table"
+
 	"github.com/rocketlaunchr/dataframe-go"
+	"github.com/rocketlaunchr/dataframe-go/imports"
 )
+
+var mainTable *table.TableWidget
 
 func main() {
 
@@ -19,7 +30,50 @@ func main() {
 	app := app.New()
 	w := app.NewWindow("Table Demo")
 
-	w.SetContent(table.NewTableWidget(df))
+	w.SetMainMenu(
+		fyne.NewMainMenu(
+			fyne.NewMenu("File",
+				fyne.NewMenuItem("Load CSV", func() {
+					dialog.ShowFileOpen(func(uri fyne.URIReadCloser, e error) {
+
+						if e != nil {
+							dialog.ShowError(e, w)
+							return
+						}
+
+						content, err := ioutil.ReadAll(uri)
+						if err != nil {
+							dialog.ShowError(err, w)
+							return
+						}
+						text := string(content)
+						reader := strings.NewReader(text)
+
+						ctx := context.Background()
+						opts := imports.CSVLoadOptions{
+							InferDataTypes: true,
+						}
+						loaded, err := imports.LoadFromCSV(ctx, reader, opts)
+
+						if err != nil {
+							dialog.ShowError(e, w)
+							return
+						}
+
+						fmt.Printf("loaded new table:\n%s\n", loaded.Table())
+
+						mainTable.ReplaceDataFrame(loaded)
+
+					}, w)
+				}),
+			),
+		),
+	)
+	w.SetMaster()
+
+	mainTable = table.NewTableWidget(df)
+
+	w.SetContent(mainTable)
 
 	w.ShowAndRun()
 
