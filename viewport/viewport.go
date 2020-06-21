@@ -1,16 +1,19 @@
 package viewport
 
 import (
+	"fmt"
 	"image/color"
 
 	"fyne.io/fyne"
 	"fyne.io/fyne/canvas"
+	"fyne.io/fyne/driver/desktop"
 	"fyne.io/fyne/theme"
 	"fyne.io/fyne/widget"
 )
 
 type viewportRenderer struct {
-	viewport *ViewportWidget
+	viewport   *ViewportWidget
+	statusText *canvas.Text
 }
 
 func (r *viewportRenderer) MinSize() fyne.Size {
@@ -24,6 +27,14 @@ func (r *viewportRenderer) ApplyTheme(size fyne.Size) {
 }
 
 func (r *viewportRenderer) Refresh() {
+	r.statusText.Move(fyne.Position{0, 0})
+	r.statusText.Text = fmt.Sprintf("x=%f y=%f zoom=%f", r.viewport.XOffset, r.viewport.YOffset, r.viewport.Zoom)
+
+	// XXX: I think this might be causing Fyne to refresh the whole canvas,
+	// since without this the ViewPort widgets don't seem to update
+	// themselves ??? Might need Refresh() to also call some kind of
+	// Refresh() function of the ViewportObjects.
+	r.statusText.Refresh()
 }
 
 func (r *viewportRenderer) BackgroundColor() color.Color {
@@ -38,6 +49,7 @@ func (r *viewportRenderer) Objects() []fyne.CanvasObject {
 	for _, viewportObj := range r.viewport.Objects {
 		objects = append(objects, viewportObj.CanvasObjects(r.viewport)...)
 	}
+	objects = append(objects, r.statusText)
 	return objects
 }
 
@@ -59,7 +71,8 @@ func (w *ViewportWidget) TappedSecondary(ev *fyne.PointEvent) {
 
 func (w *ViewportWidget) CreateRenderer() fyne.WidgetRenderer {
 	r := viewportRenderer{
-		viewport: w,
+		viewport:   w,
+		statusText: canvas.NewText("status", color.RGBA{255, 255, 255, 255}),
 	}
 
 	r.Refresh()
@@ -78,6 +91,38 @@ func NewViewportWidget(width, height int) *ViewportWidget {
 
 	vp.ExtendBaseWidget(vp)
 	return vp
+}
+
+func (w *ViewportWidget) Cursor() desktop.Cursor {
+	return desktop.DefaultCursor
+}
+
+func (w *ViewportWidget) DragEnd() {
+	w.Refresh()
+}
+
+func (w *ViewportWidget) Dragged(event *fyne.DragEvent) {
+	w.XOffset += float64(event.DraggedX) / w.Zoom
+	w.YOffset += float64(event.DraggedY) / w.Zoom
+	w.Refresh()
+}
+
+func (w *ViewportWidget) MouseIn(event *desktop.MouseEvent) {
+}
+
+func (w *ViewportWidget) MouseOut() {
+}
+
+func (w *ViewportWidget) MouseMoved(event *desktop.MouseEvent) {
+}
+
+func (w *ViewportWidget) Scrolled(ev *fyne.ScrollEvent) {
+	if ev.DeltaY > 0 {
+		w.Zoom *= 1.15
+	} else {
+		w.Zoom *= 0.85
+	}
+	w.Refresh()
 }
 
 type ViewportObject interface {
@@ -110,7 +155,7 @@ func (l ViewportLine) CanvasObjects(viewport *ViewportWidget) []fyne.CanvasObjec
 		(l.X2+viewport.XOffset)*viewport.Zoom,
 		(l.Y2+viewport.YOffset)*viewport.Zoom,
 	)
-	l.obj.StrokeWidth = float32(l.StrokeWidth)
+	l.obj.StrokeWidth = float32(l.StrokeWidth * viewport.Zoom)
 	l.obj.Hidden = false
 
 	return []fyne.CanvasObject{l.obj}

@@ -40,6 +40,24 @@ func main() {
 		StrokeWidth: 1,
 	})
 
+	vp.Objects = append(vp.Objects, viewport.ViewportLine{
+		X1:          40,
+		Y1:          20,
+		X2:          220,
+		Y2:          400,
+		StrokeColor: color.RGBA{255, 128, 128, 255},
+		StrokeWidth: 3,
+	})
+
+	vp.Objects = append(vp.Objects, viewport.ViewportLine{
+		X1:          10,
+		Y1:          200,
+		X2:          300,
+		Y2:          10,
+		StrokeColor: color.RGBA{64, 255, 64, 255},
+		StrokeWidth: 0.5,
+	})
+
 	w.SetContent(widget.NewHSplitContainer(
 		vp,
 		widget.NewVBox(
@@ -47,31 +65,37 @@ func main() {
 			widget.NewButton("Pan Left", func() {
 				fmt.Printf("vp.XOffset %v", vp.XOffset)
 				vp.XOffset += vp.Zoom * stepSize
+				vp.Refresh()
 				fmt.Printf(" -> %v\n", vp.XOffset)
 			}),
 			widget.NewButton("Pan Right", func() {
 				fmt.Printf("vp.XOffset %v", vp.XOffset)
 				vp.XOffset -= vp.Zoom * stepSize
+				vp.Refresh()
 				fmt.Printf(" -> %v\n", vp.XOffset)
 			}),
 			widget.NewButton("Pan Up", func() {
 				fmt.Printf("vp.YOffset %v", vp.YOffset)
 				vp.YOffset += vp.Zoom * stepSize
+				vp.Refresh()
 				fmt.Printf(" -> %v\n", vp.YOffset)
 			}),
 			widget.NewButton("Pan Down", func() {
 				fmt.Printf("vp.YOffset %v", vp.YOffset)
 				vp.YOffset -= vp.Zoom * stepSize
+				vp.Refresh()
 				fmt.Printf(" -> %v\n", vp.YOffset)
 			}),
 			widget.NewButton("Zoom In", func() {
 				fmt.Printf("vp.Zoom %v", vp.Zoom)
-				vp.Zoom *= 1.1
+				vp.Zoom *= 1.15
+				vp.Refresh()
 				fmt.Printf(" -> %v\n", vp.Zoom)
 			}),
 			widget.NewButton("Zoom Out", func() {
 				fmt.Printf("vp.Zoom %v", vp.Zoom)
-				vp.Zoom *= 0.9
+				vp.Zoom *= 0.85
+				vp.Refresh()
 				fmt.Printf(" -> %v\n", vp.Zoom)
 			}),
 		),
