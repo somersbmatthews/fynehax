@@ -16,3 +16,11 @@ inbox](https://lists.sr.ht/~charles/public-inbox).
 * [code](./table)
 * [demo](./cmd/tabledemo)
 
+
+### Viewport Widget
+
+The viewport widget provides a canvas-like object which can be zoomed and
+panned.
+
+* [code](./viewport)
+* [demo](./cmd/viewportdemo)
