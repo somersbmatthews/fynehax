@@ -21,6 +21,7 @@ func (r *viewportRenderer) MinSize() fyne.Size {
 }
 
 func (r *viewportRenderer) Layout(size fyne.Size) {
+	r.Refresh()
 }
 
 func (r *viewportRenderer) ApplyTheme(size fyne.Size) {
@@ -29,6 +30,10 @@ func (r *viewportRenderer) ApplyTheme(size fyne.Size) {
 func (r *viewportRenderer) Refresh() {
 	r.statusText.Move(fyne.Position{0, 0})
 	r.statusText.Text = fmt.Sprintf("x=%f y=%f zoom=%f", r.viewport.XOffset, r.viewport.YOffset, r.viewport.Zoom)
+
+	for _, viewportObj := range r.viewport.Objects {
+		viewportObj.Refresh(r.viewport)
+	}
 
 	// XXX: I think this might be causing Fyne to refresh the whole canvas,
 	// since without this the ViewPort widgets don't seem to update
@@ -127,6 +132,7 @@ func (w *ViewportWidget) Scrolled(ev *fyne.ScrollEvent) {
 
 type ViewportObject interface {
 	CanvasObjects(viewport *ViewportWidget) []fyne.CanvasObject
+	Refresh(viewport *ViewportWidget)
 }
 
 type ViewportLine struct {
@@ -144,7 +150,14 @@ func setLineEndpoints(l *canvas.Line, X1, Y1, X2, Y2 float64) {
 	l.Resize(fyne.NewSize(int(X2)-int(X1), int(Y2)-int(Y1)))
 }
 
-func (l ViewportLine) CanvasObjects(viewport *ViewportWidget) []fyne.CanvasObject {
+func (l *ViewportLine) CanvasObjects(viewport *ViewportWidget) []fyne.CanvasObject {
+	if l.obj != nil {
+		return []fyne.CanvasObject{l.obj}
+	}
+	return []fyne.CanvasObject{}
+}
+
+func (l *ViewportLine) Refresh(viewport *ViewportWidget) {
 	if l.obj == nil {
 		l.obj = canvas.NewLine(l.StrokeColor)
 	}
@@ -157,6 +170,4 @@ func (l ViewportLine) CanvasObjects(viewport *ViewportWidget) []fyne.CanvasObjec
 	)
 	l.obj.StrokeWidth = float32(l.StrokeWidth * viewport.Zoom)
 	l.obj.Hidden = false
-
-	return []fyne.CanvasObject{l.obj}
 }

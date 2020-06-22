@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"image/color"
+	"log"
+	"os"
 	"strconv"
 
 	"git.sr.ht/~charles/fynehax/viewport"
@@ -31,7 +33,7 @@ func main() {
 
 	vp := viewport.NewViewportWidget(800, 600)
 
-	vp.Objects = append(vp.Objects, viewport.ViewportLine{
+	vp.Objects = append(vp.Objects, &viewport.ViewportLine{
 		X1:          20,
 		Y1:          20,
 		X2:          200,
@@ -40,7 +42,7 @@ func main() {
 		StrokeWidth: 1,
 	})
 
-	vp.Objects = append(vp.Objects, viewport.ViewportLine{
+	vp.Objects = append(vp.Objects, &viewport.ViewportLine{
 		X1:          40,
 		Y1:          20,
 		X2:          220,
@@ -49,7 +51,7 @@ func main() {
 		StrokeWidth: 3,
 	})
 
-	vp.Objects = append(vp.Objects, viewport.ViewportLine{
+	vp.Objects = append(vp.Objects, &viewport.ViewportLine{
 		X1:          10,
 		Y1:          200,
 		X2:          300,
