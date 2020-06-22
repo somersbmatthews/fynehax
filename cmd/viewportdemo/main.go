@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"image/color"
-	"log"
-	"os"
 	"strconv"
 
 	"git.sr.ht/~charles/fynehax/viewport"
