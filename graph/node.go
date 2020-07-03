@@ -81,6 +81,9 @@ func (r *graphNodeRenderer) MinSize() fyne.Size {
 }
 
 func (r *graphNodeRenderer) Layout(size fyne.Size) {
+	r.node.Resize(r.MinSize())
+	r.node.Move(r.node.effectivePosition())
+
 	r.node.InnerObject.Move(r.node.innerPos())
 	r.node.InnerObject.Resize(r.node.effectiveInnerSize())
 
@@ -93,6 +96,9 @@ func (r *graphNodeRenderer) ApplyTheme(size fyne.Size) {
 }
 
 func (r *graphNodeRenderer) Refresh() {
+	r.node.Resize(r.MinSize())
+	r.node.Move(r.node.effectivePosition())
+
 	// move and size the inner object appropriately
 	r.node.InnerObject.Move(r.node.innerPos())
 	r.node.InnerObject.Resize(r.node.effectiveInnerSize())
@@ -118,9 +124,9 @@ func (r *graphNodeRenderer) Refresh() {
 	r.handle.StrokeWidth = r.node.HandleStroke
 	r.handle.StrokeColor = r.node.HandleColor
 
-	canvas.Refresh(r.node.InnerObject)
 	canvas.Refresh(r.box)
 	canvas.Refresh(r.handle)
+	canvas.Refresh(r.node.InnerObject)
 }
 
 func (r *graphNodeRenderer) BackgroundColor() color.Color {
@@ -162,7 +168,7 @@ func NewGraphNode(obj fyne.CanvasObject) *GraphNode {
 		LogicalPosition: fyne.Position{0, 0},
 		Offset:          fyne.Position{0, 0},
 		BoxStrokeWidth:  1,
-		BoxFillColor:    theme.BackgroundColor(),
+		BoxFillColor:    theme.PlaceHolderColor(),
 		BoxStrokeColor:  theme.TextColor(),
 		HandleColor:     theme.TextColor(),
 		HandleStroke:    3,
