@@ -5,6 +5,7 @@ import (
 
 	"fyne.io/fyne"
 	"fyne.io/fyne/canvas"
+	"fyne.io/fyne/driver/desktop"
 	"fyne.io/fyne/theme"
 	"fyne.io/fyne/widget"
 )
@@ -185,4 +186,31 @@ func (n *GraphNode) effectiveInnerSize() fyne.Size {
 
 func (n *GraphNode) effectivePosition() fyne.Position {
 	return n.Offset.Add(n.LogicalPosition)
+}
+
+func (n *GraphNode) Cursor() desktop.Cursor {
+	return desktop.DefaultCursor
+}
+
+func (n *GraphNode) DragEnd() {
+	n.Refresh()
+}
+
+func (n *GraphNode) Dragged(event *fyne.DragEvent) {
+	delta := fyne.Position{X: event.DraggedX, Y: event.DraggedY}
+	n.LogicalPosition = n.LogicalPosition.Add(delta)
+	n.Refresh()
+}
+
+func (n *GraphNode) MouseIn(event *desktop.MouseEvent) {
+	n.HandleColor = theme.FocusColor()
+	n.Refresh()
+}
+
+func (n *GraphNode) MouseOut() {
+	n.HandleColor = theme.TextColor()
+	n.Refresh()
+}
+
+func (n *GraphNode) MouseMoved(event *desktop.MouseEvent) {
 }
