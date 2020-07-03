@@ -38,7 +38,6 @@ func (r *graphRenderer) ApplyTheme(size fyne.Size) {
 
 func (r *graphRenderer) Refresh() {
 	for _, n := range r.graph.Nodes {
-		n.Offset = r.graph.Offset
 		n.Refresh()
 	}
 }
@@ -77,7 +76,9 @@ func (g *GraphWidget) DragEnd() {
 
 func (g *GraphWidget) Dragged(event *fyne.DragEvent) {
 	delta := fyne.Position{X: event.DraggedX, Y: event.DraggedY}
-	g.Offset = g.Offset.Add(delta)
+	for _, n := range g.Nodes {
+		n.Displace(delta)
+	}
 	g.Refresh()
 }
 
