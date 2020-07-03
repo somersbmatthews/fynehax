@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"fyne.io/fyne"
+	"fyne.io/fyne/driver/desktop"
 	"fyne.io/fyne/theme"
 	"fyne.io/fyne/widget"
 )
@@ -64,6 +65,29 @@ func (g *GraphWidget) CreateRenderer() fyne.WidgetRenderer {
 	}
 
 	return &r
+}
+
+func (g *GraphWidget) Cursor() desktop.Cursor {
+	return desktop.DefaultCursor
+}
+
+func (g *GraphWidget) DragEnd() {
+	g.Refresh()
+}
+
+func (g *GraphWidget) Dragged(event *fyne.DragEvent) {
+	delta := fyne.Position{X: event.DraggedX, Y: event.DraggedY}
+	g.Offset = g.Offset.Add(delta)
+	g.Refresh()
+}
+
+func (g *GraphWidget) MouseIn(event *desktop.MouseEvent) {
+}
+
+func (g *GraphWidget) MouseOut() {
+}
+
+func (g *GraphWidget) MouseMoved(event *desktop.MouseEvent) {
 }
 
 func NewGraph() *GraphWidget {
