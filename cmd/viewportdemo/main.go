@@ -9,9 +9,14 @@ import (
 
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/widget"
+
+	"github.com/pkg/profile"
 )
 
 func main() {
+
+	defer profile.Start(profile.MemProfile).Stop()
+
 	app := app.New()
 	w := app.NewWindow("Viewport Demo")
 
