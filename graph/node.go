@@ -42,8 +42,13 @@ type GraphNode struct {
 	// and the box.
 	Padding int
 
-	// Location is the position at which the node should render.
-	Location fyne.Position
+	// LogicalPosition is position of the node within the context of the
+	// Graph.
+	LogicalPosition fyne.Position
+
+	// Offset is the offset from the origin of the parent object. Whenever
+	// the user pans in the parent, the parent should update this.
+	Offset fyne.Position
 
 	// BoxStrokeWidth is the stroke width of the box which delineates the
 	// node. Defaults to 1.
@@ -92,7 +97,7 @@ func (r *graphNodeRenderer) Refresh() {
 	r.node.InnerObject.Resize(r.node.effectiveInnerSize())
 
 	// move the box and update it's colors
-	r.box.Move(r.node.Location)
+	r.box.Move(r.node.effectivePosition())
 	r.box.StrokeWidth = r.node.BoxStrokeWidth
 	r.box.FillColor = r.node.BoxFillColor
 	r.box.StrokeColor = r.node.BoxStrokeColor
@@ -100,13 +105,13 @@ func (r *graphNodeRenderer) Refresh() {
 
 	// calculate the handle positions
 	r.handle.Position1 = fyne.Position{
-		X: r.node.Location.X + r.node.Padding,
-		Y: r.node.Location.Y + r.node.Padding/2,
+		X: r.node.effectivePosition().X + r.node.Padding,
+		Y: r.node.effectivePosition().Y + r.node.Padding/2,
 	}
 
 	r.handle.Position2 = fyne.Position{
-		X: r.node.Location.X + r.node.effectiveInnerSize().Width + r.node.Padding,
-		Y: r.node.Location.Y + r.node.Padding/2,
+		X: r.node.effectivePosition().X + r.node.effectiveInnerSize().Width + r.node.Padding,
+		Y: r.node.effectivePosition().Y + r.node.Padding/2,
 	}
 
 	r.handle.StrokeWidth = r.node.HandleStroke
@@ -150,15 +155,16 @@ func (n *GraphNode) CreateRenderer() fyne.WidgetRenderer {
 
 func NewGraphNode(obj fyne.CanvasObject) *GraphNode {
 	w := &GraphNode{
-		InnerSize:      fyne.Size{Width: defaultWidth, Height: defaultHeight},
-		InnerObject:    obj,
-		Padding:        defaultPadding,
-		Location:       fyne.Position{0, 0},
-		BoxStrokeWidth: 1,
-		BoxFillColor:   theme.BackgroundColor(),
-		BoxStrokeColor: theme.TextColor(),
-		HandleColor:    theme.TextColor(),
-		HandleStroke:   3,
+		InnerSize:       fyne.Size{Width: defaultWidth, Height: defaultHeight},
+		InnerObject:     obj,
+		Padding:         defaultPadding,
+		LogicalPosition: fyne.Position{0, 0},
+		Offset:          fyne.Position{0, 0},
+		BoxStrokeWidth:  1,
+		BoxFillColor:    theme.BackgroundColor(),
+		BoxStrokeColor:  theme.TextColor(),
+		HandleColor:     theme.TextColor(),
+		HandleStroke:    3,
 	}
 
 	w.ExtendBaseWidget(w)
@@ -168,11 +174,15 @@ func NewGraphNode(obj fyne.CanvasObject) *GraphNode {
 
 func (n *GraphNode) innerPos() fyne.Position {
 	return fyne.Position{
-		X: n.Location.X + n.Padding,
-		Y: n.Location.Y + n.Padding,
+		X: n.effectivePosition().X + n.Padding,
+		Y: n.effectivePosition().Y + n.Padding,
 	}
 }
 
 func (n *GraphNode) effectiveInnerSize() fyne.Size {
 	return n.InnerSize.Max(n.InnerObject.MinSize())
+}
+
+func (n *GraphNode) effectivePosition() fyne.Position {
+	return n.Offset.Add(n.LogicalPosition)
 }
