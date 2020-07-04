@@ -123,3 +123,53 @@ func (b Box) Bottom() Line {
 func (b Box) Center() Vec2 {
 	return b.A.Add(b.S.Scale(0.5))
 }
+
+// Contains returns true if the point v is within the box b.
+func (b Box) Contains(v Vec2) bool {
+	if (v.X < b.GetCorner1().X) && (v.X > b.GetCorner2().X) {
+		return false
+	}
+
+	if (v.Y < b.GetCorner1().Y) && (v.Y > b.GetCorner3().Y) {
+		return false
+	}
+
+	return true
+}
+
+// BoundingBox creates a minimum axis-aligned bounding box for the given list
+// of points.
+func BoundingBox(points []Vec2) Box {
+	if len(points) < 2 {
+		return MakeBox(V2(0, 0), V2(0, 0))
+	}
+
+	topleft := points[0]
+	bottomright := points[1]
+	points = points[1 : len(points)-1]
+
+	for _, p := range points {
+		if p.X < topleft.X {
+			topleft.X = p.X
+		}
+		if p.Y < topleft.Y {
+			topleft.Y = p.Y
+		}
+		if p.X > bottomright.X {
+			bottomright.X = p.X
+		}
+		if p.Y > bottomright.Y {
+			bottomright.Y = p.Y
+		}
+	}
+
+	return MakeBox(topleft, bottomright)
+}
+
+func (b Box) Width() float64 {
+	return b.Top().Length()
+}
+
+func (b Box) Height() float64 {
+	return b.Left().Length()
+}

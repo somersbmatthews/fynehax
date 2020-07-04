@@ -55,6 +55,10 @@ func samesign(a, b float64) bool {
 	return false
 }
 
+func (l Line) Length() float64 {
+	return l.S.Length()
+}
+
 // This code is transliterated from here:
 //
 // https://github.com/JulNadeauCA/libagar/blob/master/gui/primitive.co

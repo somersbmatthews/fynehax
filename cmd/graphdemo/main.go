@@ -60,6 +60,7 @@ func main() {
 	g.Edges["edge0"] = graph.NewGraphEdge(g, n1, n2)
 	g.Edges["edge1"] = graph.NewGraphEdge(g, n3, n2)
 	g.Edges["edge1"].EdgeColor = color.RGBA{255, 64, 64, 255}
+	g.Edges["edge1"].Directed = true
 
 	w.SetContent(g)
 
