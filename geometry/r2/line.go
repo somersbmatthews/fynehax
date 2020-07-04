@@ -39,38 +39,87 @@ func (l Line) Endpoint2() Vec2 {
 	return l.A.Add(l.S)
 }
 
-// IntersectLines returns the point at which two lines intersect, or the
-// zero vector, along with a boolean indicating if the lines intersect.
-//
-// Based on the code described here: https://stackoverflow.com/a/14795484
-func IntersectLines(l1, l2 Line) (Vec2, bool) {
-	s10x := l1.Endpoint2().X - l1.Endpoint1().X
-	s10y := l1.Endpoint2().Y - l1.Endpoint1().Y
-	s32x := l2.Endpoint2().X - l2.Endpoint1().X
-	s32y := l2.Endpoint2().Y - l2.Endpoint1().Y
+func samesign(a, b float64) bool {
+	if (a < 0) && (b < 0) {
+		return true
+	}
 
-	denom := s10x*s32y - s32x*s10y
+	if (a > 0) && (b > 0) {
+		return true
+	}
+
+	if a == b {
+		return true
+	}
+
+	return false
+}
+
+// This code is transliterated from here:
+//
+// https://github.com/JulNadeauCA/libagar/blob/master/gui/primitive.co
+//
+// Which is in turn based on Gem I.2 in Graphics Gems II by James Arvo.
+func IntersectLines(l1, l2 Line) (Vec2, bool) {
+	x1 := l1.Endpoint1().X
+	y1 := l1.Endpoint1().Y
+	x2 := l1.Endpoint2().X
+	y2 := l1.Endpoint2().Y
+	x3 := l2.Endpoint1().X
+	y3 := l2.Endpoint1().Y
+	x4 := l2.Endpoint2().X
+	y4 := l2.Endpoint2().Y
+
+	a1 := y2 - y1
+	b1 := x1 - x2
+	c1 := x2*y1 - x1*y2
+
+	r3 := a1*x3 + b1*y3 + c1
+	r4 := a1*x4 + b1*y4 + c1
+
+	if (r3 != 0) && (r4 != 0) && samesign(r3, r4) {
+		return V2(0, 0), false
+	}
+
+	a2 := y4 - y3
+	b2 := x3 - x4
+	c2 := x4*y3 - x3*y4
+
+	r1 := a2*x1 + b2*y1 + c2
+	r2 := a2*x2 + b2*y2 + c2
+
+	if (r1 != 0) && (r2 != 0) && samesign(r1, r2) {
+		return V2(0, 0), false
+	}
+
+	denom := a1*b2 - a2*b1
 	if denom == 0 {
 		return V2(0, 0), false
 	}
-	denomPositive := denom > 0
 
-	s02x := l1.Endpoint1().X - l1.Endpoint1().X
-	s02y := l1.Endpoint1().Y - l1.Endpoint1().Y
-	s_numer := s10x*s02y - s10y*s02x
-	if (s_numer < 0) == denomPositive {
-		return V2(0, 0), false
+	offset := 0.0 - denom/2.0
+	if denom < 0 {
+		offset = denom / 2.0
 	}
 
-	t_numer := s32x*s02y - s32y*s02x
-	if (t_numer < 0) == denomPositive {
-		return V2(0, 0), false
+	num := b1*c2 - b2*c1
+	xi := 0.0
+	if num < 0 {
+		xi = num - offset
+	} else {
+		xi = num + offset
 	}
+	xi /= denom
 
-	if ((s_numer > denom) == denomPositive) || ((t_numer > denom) == denomPositive) {
-		return V2(0, 0), false
+	num = a2*c1 - a1*c2
+	yi := 0.0
+	if num < 0 {
+		yi = num - offset
+	} else {
+		yi = num + offset
 	}
+	yi /= denom
 
-	t := t_numer / denom
-	return V2(l1.Endpoint1().X+t*s10x, l1.Endpoint1().Y+t*s10y), true
+	return V2(xi, yi), true
+
 }
