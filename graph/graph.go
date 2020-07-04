@@ -23,7 +23,7 @@ type GraphWidget struct {
 	DesiredSize fyne.Size
 
 	Nodes map[string]*GraphNode
-	// Edges map[string]GraphEdge
+	Edges map[string]*GraphEdge
 }
 
 func (r *graphRenderer) MinSize() fyne.Size {
@@ -37,6 +37,9 @@ func (r *graphRenderer) ApplyTheme(size fyne.Size) {
 }
 
 func (r *graphRenderer) Refresh() {
+	for _, e := range r.graph.Edges {
+		e.Refresh()
+	}
 	for _, n := range r.graph.Nodes {
 		n.Refresh()
 	}
@@ -51,6 +54,9 @@ func (r *graphRenderer) Destroy() {
 
 func (r *graphRenderer) Objects() []fyne.CanvasObject {
 	obj := make([]fyne.CanvasObject, 0)
+	for _, e := range r.graph.Edges {
+		obj = append(obj, e)
+	}
 	for _, n := range r.graph.Nodes {
 		obj = append(obj, n)
 	}
@@ -96,9 +102,24 @@ func NewGraph() *GraphWidget {
 		DesiredSize: fyne.Size{Width: 800, Height: 600},
 		Offset:      fyne.Position{0, 0},
 		Nodes:       map[string]*GraphNode{},
+		Edges:       map[string]*GraphEdge{},
 	}
 
 	g.ExtendBaseWidget(g)
 
 	return g
+}
+
+func (g *GraphWidget) GetEdges(n *GraphNode) []*GraphEdge {
+	edges := []*GraphEdge{}
+
+	for _, e := range g.Edges {
+		if e.Origin == n {
+			edges = append(edges, e)
+		} else if e.Target == n {
+			edges = append(edges, e)
+		}
+	}
+
+	return edges
 }

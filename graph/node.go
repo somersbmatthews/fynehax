@@ -3,6 +3,8 @@ package graph
 import (
 	"image/color"
 
+	"git.sr.ht/~charles/fynehax/geometry/r2"
+
 	"fyne.io/fyne"
 	"fyne.io/fyne/canvas"
 	"fyne.io/fyne/driver/desktop"
@@ -30,6 +32,8 @@ type graphNodeRenderer struct {
 // around.
 type GraphNode struct {
 	widget.BaseWidget
+
+	Graph *GraphWidget
 
 	// InnerSize stores size that the inner object should have, may not
 	// be respected if not large enough for the object.
@@ -111,6 +115,10 @@ func (r *graphNodeRenderer) Refresh() {
 	r.handle.StrokeWidth = r.node.HandleStroke
 	r.handle.StrokeColor = r.node.HandleColor
 
+	for _, e := range r.node.Graph.GetEdges(r.node) {
+		e.Refresh()
+	}
+
 	canvas.Refresh(r.box)
 	canvas.Refresh(r.handle)
 	canvas.Refresh(r.node.InnerObject)
@@ -147,8 +155,9 @@ func (n *GraphNode) CreateRenderer() fyne.WidgetRenderer {
 	return &r
 }
 
-func NewGraphNode(obj fyne.CanvasObject) *GraphNode {
+func NewGraphNode(g *GraphWidget, obj fyne.CanvasObject) *GraphNode {
 	w := &GraphNode{
+		Graph:          g,
 		InnerSize:      fyne.Size{Width: defaultWidth, Height: defaultHeight},
 		InnerObject:    obj,
 		Padding:        defaultPadding,
@@ -204,4 +213,26 @@ func (n *GraphNode) MouseMoved(event *desktop.MouseEvent) {
 
 func (n *GraphNode) Displace(delta fyne.Position) {
 	n.Move(n.Position().Add(delta))
+}
+
+func (n *GraphNode) R2Position() r2.Vec2 {
+	return r2.V2(float64(n.Position().X), float64(n.Position().Y))
+}
+
+func (n *GraphNode) R2Box() r2.Box {
+	inner := n.effectiveInnerSize()
+	s := r2.V2(
+		float64(inner.Width+2*n.Padding),
+		float64(inner.Height+2*n.Padding),
+	)
+
+	return r2.MakeBox(n.R2Position(), s)
+}
+
+func (n *GraphNode) R2Center() r2.Vec2 {
+	return n.R2Box().Center()
+}
+
+func (n *GraphNode) Center() fyne.Position {
+	return fyne.Position{int(n.R2Center().X), int(n.R2Center().Y)}
 }

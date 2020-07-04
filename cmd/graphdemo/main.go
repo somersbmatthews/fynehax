@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 
 	"git.sr.ht/~charles/fynehax/graph"
 
@@ -11,25 +12,25 @@ import (
 )
 
 func main() {
-	fmt.Println("vim-go")
-
 	app := app.New()
-	w := app.NewWindow("Viewport Demo")
+	w := app.NewWindow("Graph Demo")
 
 	w.SetMaster()
 
 	g := graph.NewGraph()
 
 	l := widget.NewLabel("teeexxttt")
-	n := graph.NewGraphNode(l)
+	n := graph.NewGraphNode(g, l)
 	g.Nodes["node0"] = n
+	n1 := n
 
 	b := widget.NewButton("button", func() { fmt.Printf("tapped!\n") })
-	n = graph.NewGraphNode(b)
+	n = graph.NewGraphNode(g, b)
 	n.Move(fyne.Position{200, 200})
 	g.Nodes["node1"] = n
+	n2 := n
 
-	n = graph.NewGraphNode(nil)
+	n = graph.NewGraphNode(g, nil)
 	c := widget.NewVBox(
 		widget.NewLabel("Fancy node!"),
 		widget.NewButton("Up", func() {
@@ -54,6 +55,11 @@ func main() {
 	n.InnerObject = c
 	n.Move(fyne.Position{300, 300})
 	g.Nodes["node2"] = n
+	n3 := n
+
+	g.Edges["edge0"] = graph.NewGraphEdge(g, n1, n2)
+	g.Edges["edge1"] = graph.NewGraphEdge(g, n3, n2)
+	g.Edges["edge1"].EdgeColor = color.RGBA{255, 64, 64, 255}
 
 	w.SetContent(g)
 
