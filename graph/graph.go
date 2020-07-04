@@ -54,11 +54,11 @@ func (r *graphRenderer) Destroy() {
 
 func (r *graphRenderer) Objects() []fyne.CanvasObject {
 	obj := make([]fyne.CanvasObject, 0)
-	for _, e := range r.graph.Edges {
-		obj = append(obj, e)
-	}
 	for _, n := range r.graph.Nodes {
 		obj = append(obj, n)
+	}
+	for _, e := range r.graph.Edges {
+		obj = append(obj, e)
 	}
 
 	return obj

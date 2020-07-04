@@ -80,6 +80,9 @@ func (b Box) Intersect(l Line) (Vec2, bool) {
 
 	for i := range faces {
 		in, ok := IntersectLines(faces[i], l)
+		if !ok {
+			continue
+		}
 		dists[i] = in.Length()
 		intersects[i] = ok
 		intersectPoints[i] = in
