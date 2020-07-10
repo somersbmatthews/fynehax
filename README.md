@@ -24,3 +24,13 @@ panned.
 
 * [code](./viewport)
 * [demo](./cmd/viewportdemo)
+
+### Graph Widget
+
+The graph widget implements a graph visualization widget which supports
+directed and un-directed edges. Widgets can be embedded within nodes, and nodes
+can be moved around.
+
+* [code](./graph)
+* [demo](./cmd/graphdemo)
+
